@@ -1,0 +1,9 @@
+﻿-- IamLearningPBI Database
+
+EVALUATE
+ROW ( "Total Sales", SUMX ( Orders, Orders[Quantity] * Orders[NetPrice] ) )
+
+/*
+SELECT SUM(OP.Quantity * OP.NetPrice) AS [Total Sales]
+FROM DBO.OrderPos AS OP
+*/
