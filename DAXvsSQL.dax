@@ -1,9 +1,41 @@
 ﻿-- IamLearningPBI Database
-
 EVALUATE
-ROW ( "Total Sales", SUMX ( Orders, Orders[Quantity] * Orders[NetPrice] ) )
-
+ROW (
+    "Total Sales", SUMX ( Orders, Orders[Quantity] * Orders[NetPrice] ),
+    "Min value", MINX ( Orders, Orders[Quantity] * Orders[NetPrice] ),
+    "Max value", MAXX ( Orders, Orders[Quantity] * Orders[NetPrice] ),
+    "Avg Sales", ROUND ( AVERAGEX ( Orders, Orders[Quantity] * Orders[NetPrice] ), 2 )
+)
 /*
 SELECT SUM(OP.Quantity * OP.NetPrice) AS [Total Sales]
 FROM DBO.OrderPos AS OP
 */
+EVALUATE
+ADDCOLUMNS (
+    Articles,
+    "Total Sales Column", SUMX ( RELATEDTABLE ( Orders ), Orders[Quantity] * Orders[NetPrice] )
+)
+
+
+EVALUATE
+FILTER ( Articles, Articles[StockNetPrice] > 950 )
+
+EVALUATE
+FILTER (
+    Articles,
+    Articles[StockNetPrice] > 950
+        && Articles[Color] = "Niebieski"
+        && CONTAINSSTRING(Articles[Number] , "56")
+        && SUMX( RELATEDTABLE( Orders ) , Orders[Quantity] * Orders[NetPrice]) > 195192
+
+)
+
+EVALUATE
+ALL( Articles[Color], Articles[Type] )
+
+EVALUATE
+VAR ColorAndType = ALL ( Articles[Color], Articles[Type] )
+VAR AvgSales = AVERAGEX( ColorAndType, SUMX( RELATEDTABLE( Orders ), Orders[Quantity] * Orders[NetPrice] ) )
+VAR TopProduct = FILTER( ColorAndType, SUMX( RELATEDTABLE( Orders ), Orders[Quantity] * Orders[NetPrice] ) > AvgSales)
+RETURN
+TopProduct
