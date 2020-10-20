@@ -39,3 +39,45 @@ VAR AvgSales = AVERAGEX( ColorAndType, SUMX( RELATEDTABLE( Orders ), Orders[Quan
 VAR TopProduct = FILTER( ColorAndType, SUMX( RELATEDTABLE( Orders ), Orders[Quantity] * Orders[NetPrice] ) > AvgSales)
 RETURN
 TopProduct
+
+EVALUATE
+VAR FILTERTABLE =
+    FILTER ( Articles, Articles[Color] IN { "Niebieski", "Czerwony" } )
+VAR C =
+    SUMMARIZE ( FILTERTABLE, Articles[Color] )
+RETURN
+    ADDCOLUMNS (
+        C,
+        "A", CALCULATE ( SUMX ( Orders, Orders[Quantity] * Orders[NetPrice] ) ),
+        "B", CALCULATE ( SUMX ( ALL ( Orders ), Orders[Quantity] * Orders[NetPrice] ) ),
+        "C", CALCULATE ( SUMX ( ALLSELECTED ( Orders ), Orders[Quantity] * Orders[NetPrice] ) ) 
+    )
+    
+/*
+SELECT OrderAmount AS OrderAmountPerColor
+	, (
+		SELECT SUM(OP.Quantity * OP.NetPrice)
+		FROM DBO.OrderPos AS OP
+		) AS OrderAmountALLColors
+	, SUM(OrderAmount) OVER () AS OrderAmountALLSELECTEDColors
+FROM (
+	SELECT A.Color
+		, SUM(OP.Quantity * OP.NetPrice) AS OrderAmount
+	FROM DBO.Articles AS A
+	INNER JOIN DBO.OrderPos AS OP ON A.ArticleId = OP.ArticleId
+	WHERE A.Color IN ('Niebieski', 'Czerwony')
+	GROUP BY A.Color
+	) AS T
+	
+
+*/
+
+EVALUATE
+VAR T = CALCULATETABLE(VALUES( Articles[Color]), Articles[Color] IN {"Niebieski", "Czerwony"})
+RETURN
+ADDCOLUMNS (
+        T,
+        "A", CALCULATE ( SUMX ( Orders, Orders[Quantity] * Orders[NetPrice] ) ),
+        "B", CALCULATE ( SUMX ( ALL ( Orders ), Orders[Quantity] * Orders[NetPrice] ) ),
+        "C", CALCULATE ( SUMX ( ALLSELECTED ( Orders ), Orders[Quantity] * Orders[NetPrice] ) ) 
+    )
