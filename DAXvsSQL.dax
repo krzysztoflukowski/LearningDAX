@@ -1,6 +1,5 @@
 ﻿-- IamLearningPBI Database
 EVALUATE
-
 ROW (
     "Total Sales", SUMX ( Orders, Orders[Quantity] * Orders[NetPrice] ),
     "Min value", MINX ( Orders, Orders[Quantity] * Orders[NetPrice] ),
